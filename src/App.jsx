@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const tempMovieData = [
   {
@@ -49,10 +49,24 @@ const tempWatchedData = [
 
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
-
+const KEY = "46ef70da";
 export default function App() {
+  const [query, setQuery] = useState("");
   const [movies, setMovies] = useState(tempMovieData);
   const [watched, setWatched] = useState(tempWatchedData);
+  const [loading, setLoading] = useState(false);
+  useEffect(function () {
+    async function fetchMovies() {
+      setLoading(true);
+      const res = await fetch(
+        `https://www.omdbapi.com/?s=Interstellar&apikey=${KEY}`
+      );
+      const data = await res.json();
+      setMovies(data.Search);
+      setLoading(false);
+    }
+    fetchMovies();
+  }, []);
   return (
     <>
       <NavBar>
@@ -61,9 +75,7 @@ export default function App() {
         <NumResults movies={movies} />
       </NavBar>
       <Main>
-        <Box>
-          <MoviesList movies={movies} />
-        </Box>
+        <Box>{loading ? <Loader /> : <MoviesList movies={movies} />}</Box>
         <Box>
           <WatchedSummery watched={watched} />
           <WatchedMoviesList watched={watched} />
@@ -73,12 +85,13 @@ export default function App() {
     </>
   );
 }
+function Loader() {
+  return <p className="loader">Loading...</p>;
+}
 function NavBar({ children }) {
   return <nav className="nav-bar">{children}</nav>;
 }
-function Search() {
-  const [query, setQuery] = useState("");
-
+function Search({ query, setQuery }) {
   return (
     <input
       className="search"
@@ -120,28 +133,6 @@ function Box({ children }) {
   );
 }
 
-// function WatchedBox() {
-//
-
-//   const [isOpen2, setIsOpen2] = useState(true);
-
-//   return (
-//     <div className="box">
-//       <button
-//         className="btn-toggle"
-//         onClick={() => setIsOpen2((open) => !open)}
-//       >
-//         {isOpen2 ? "–" : "+"}
-//       </button>
-//       {isOpen2 && (
-//         <>
-//           <WatchedSummery watched={watched} />
-//           <WatchedMoviesList watched={watched} />
-//         </>
-//       )}
-//     </div>
-//   );
-// }
 function MoviesList({ movies }) {
   return (
     <ul className="list">
@@ -153,16 +144,20 @@ function MoviesList({ movies }) {
 }
 function Movie({ movie }) {
   return (
-    <li>
-      <img src={movie.Poster} alt={`${movie.Title} poster`} />
-      <h3>{movie.Title}</h3>
-      <div>
-        <p>
-          <span>🗓</span>
-          <span>{movie.Year}</span>
-        </p>
-      </div>
-    </li>
+    <>
+      {movie.Poster === "N/A" ? null : (
+        <li>
+          <img src={movie.Poster} alt={`${movie.Title} poster`} />
+          <h3>{movie.Title}</h3>
+          <div>
+            <p>
+              <span>🗓</span>
+              <span>{movie.Year}</span>
+            </p>
+          </div>
+        </li>
+      )}
+    </>
   );
 }
 

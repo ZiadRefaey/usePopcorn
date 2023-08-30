@@ -5,11 +5,13 @@ function StarRating({
   size = 32,
   color = "#F9FF2B",
   defaultRating = 0,
+  setUserRating,
 }) {
   const [rating, setRating] = useState(defaultRating);
   const [tempRating, setTempRating] = useState(0);
   function ratingHandler(rating) {
     setRating(rating);
+    setUserRating(rating);
   }
   return (
     <div
@@ -22,7 +24,7 @@ function StarRating({
     >
       <div style={{ display: "flex" }}>
         {Array.from({ length: Stars }, (_, i) => (
-          <p>
+          <p key={i}>
             <Star
               color={color}
               size={size}

@@ -5,13 +5,11 @@ function StarRating({
   size = 32,
   color = "#F9FF2B",
   defaultRating = 0,
-  onSetRating,
 }) {
   const [rating, setRating] = useState(defaultRating);
   const [tempRating, setTempRating] = useState(0);
   function ratingHandler(rating) {
     setRating(rating);
-    onSetRating(rating);
   }
   return (
     <div
